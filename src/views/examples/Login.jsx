@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 import { Redirect } from "react-router-dom";
 
@@ -22,14 +23,27 @@ class Login extends React.Component {
       email: "",
       password: ""
     },
-    redirectToAdmin: false
+    redirectToAdmin: false,
+    loading: undefined
   };
 
   // Login form submit
   loginSubmitHandle = e => {
     e.preventDefault();
-    // alert('test')
-    this.setState({ redirectToAdmin: true });
+    axios
+      .post("http://136ea.k.time4vps.cloud:9090/api/v1/auth", {
+        email: this.state.credentials.email,
+        password: this.state.credentials.password
+      })
+      .then(res => {
+        if (res.status === 200 && res.headers.authorization) {
+          localStorage.setItem("jwt-token", res.headers.authorization);
+          this.setState({ redirectToAdmin: true });
+        } else {
+          alert("invalid credentials");
+        }
+      })
+      .catch(e => console.log(e));
   };
 
   // Handle email input
@@ -61,6 +75,7 @@ class Login extends React.Component {
     } else {
       return (
         <>
+          {localStorage.setItem("jwt-token", null)}
           <Col lg="5" md="7">
             <Card className="bg-secondary shadow border-0">
               <CardBody className="px-lg-5 py-lg-5">
