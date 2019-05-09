@@ -1,0 +1,37 @@
+
+.sort-btns-white {
+    color:gray;
+    border: 0px;
+    background: transparent;
+}
+
+.sort-btns-red {
+    color:darkred!important;
+    border: 0px;
+    background: transparent;
+}
+
+
+.sort-btns:hover {
+    color:darkred!important;
+}
+
+.t-header {
+font-weight:800!important;
+}
+
+
+thead th {
+    font-weight:900!important;
+    font-family:impact;
+    font-size:17px!important;
+}
+
+.shadow {
+    margin-top:10%;
+    margin-bottom:10%;
+}
+
+.mt--7 {
+    background-color: #F5F5F5;
+}

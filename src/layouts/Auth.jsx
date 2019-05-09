@@ -1,12 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-// reactstrap components
 import { Container, Row, Col } from "reactstrap";
-
-// core components
-import AuthNavbar from "components/Navbars/AuthNavbar.jsx";
-import AuthFooter from "components/Footers/AuthFooter.jsx";
-
 import routes from "routes.js";
 
 class Auth extends React.Component {
@@ -35,7 +29,6 @@ class Auth extends React.Component {
     return (
       <>
         <div className="main-content">
-          <AuthNavbar />
           <div className="header bg-gradient-info py-7 py-lg-8">
             <Container>
               <div className="header-body text-center mb-7">
@@ -66,17 +59,16 @@ class Auth extends React.Component {
               </svg>
             </div>
           </div>
-          {/* Page content */}
           <Container className="mt--8 pb-5">
             <Row className="justify-content-center">
               <Switch>{this.getRoutes(routes)}</Switch>
             </Row>
           </Container>
         </div>
-        <AuthFooter />
       </>
     );
   }
 }
 
 export default Auth;
+
