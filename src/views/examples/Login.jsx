@@ -7,6 +7,7 @@ import { Redirect } from "react-router-dom";
 import {
   Button,
   Card,
+  CardTitle,
   CardBody,
   FormGroup,
   Form,
@@ -14,7 +15,8 @@ import {
   InputGroupAddon,
   InputGroupText,
   InputGroup,
-  Col
+  Col,
+  Alert
 } from "reactstrap";
 
 class Login extends React.Component {
@@ -24,12 +26,11 @@ class Login extends React.Component {
       password: ""
     },
     redirectToAdmin: false,
-    loading: undefined
+    loading: true,
+    isOpened: false
   };
 
-  // Login form submit
-  loginSubmitHandle = e => {
-    e.preventDefault();
+  getJWT = () => {
     axios
       .post("http://136ea.k.time4vps.cloud:9090/api/v1/auth", {
         email: this.state.credentials.email,
@@ -40,10 +41,17 @@ class Login extends React.Component {
           localStorage.setItem("jwt-token", res.headers.authorization);
           this.setState({ redirectToAdmin: true });
         } else {
-          alert("invalid credentials");
+          //alert("invalid credentials");
+          this.setState({ loading: false });
         }
       })
       .catch(e => console.log(e));
+  };
+
+  // Login form submit
+  loginSubmitHandle = e => {
+    e.preventDefault();
+    this.getJWT();
   };
 
   // Handle email input
@@ -68,9 +76,67 @@ class Login extends React.Component {
     }));
   };
 
+  // Close invalid credentials Alert
+  toggleInvalidCredentials = () => {
+    this.setState(oldState => ({ isOpened: !oldState.isOpened }));
+  };
+
+  // Check if the status from the server is 401 when the component is mounted 
+  componentDidMount() {
+    axios.interceptors.response.use(
+      response => {
+        return response;
+      },
+      error => {
+        if (error.response.status === 401) {
+          this.setState({
+            credentials: {
+              email: "",
+              password: ""
+            },
+            redirectToAdmin: false,
+            loading: true,
+            isOpened: false
+          });
+        }
+        return error;
+      }
+    );
+  }
+
   render() {
     const redir = this.state.redirectToAdmin;
-    if (redir) {
+    const jwt = localStorage.getItem("jwt-token");
+    const loading = this.state.loading;
+    const isOpen = this.state.isOpened;
+
+    let cardTitle = (
+      <div>
+        <div className="text-center text-muted mb-4">
+          <h5>Log in with your credentials</h5>
+        </div>
+      </div>
+    );
+
+    if (!loading && !isOpen) {
+      cardTitle = (
+        <Alert
+          color="danger"
+          className="text-center"
+          onClick={this.toggleInvalidCredentials}
+          style={{ cursor: "pointer" }}
+        >
+          <h5 className="text-white">
+            {" "}
+            Invalid username or password!{" "}
+            <i className="ni ni-fat-remove text-right " />
+          </h5>
+          <small className="d-block">Please,try again.</small>
+        </Alert>
+      );
+    }
+
+    if (redir && jwt !== "null") {
       return <Redirect to="/admin/index" />;
     } else {
       return (
@@ -79,10 +145,7 @@ class Login extends React.Component {
           <Col lg="5" md="7">
             <Card className="bg-secondary shadow border-0">
               <CardBody className="px-lg-5 py-lg-5">
-                <div className="text-center text-muted mb-4">
-                  <small>Log in with your credentials</small>
-                </div>
-
+                <CardTitle>{cardTitle}</CardTitle>
                 <Form role="form" onSubmit={this.loginSubmitHandle}>
                   <FormGroup className="mb-3">
                     <InputGroup className="input-group-alternative">
@@ -95,6 +158,7 @@ class Login extends React.Component {
                         placeholder="Email"
                         name="email"
                         type="email"
+                        value={this.state.credentials.email}
                         onChange={e => this.emailInputHandler(e)}
                         required
                       />
@@ -111,6 +175,7 @@ class Login extends React.Component {
                         placeholder="Password"
                         name="password"
                         type="password"
+                        value={this.state.credentials.password}
                         onChange={e => this.passwordInputHandler(e)}
                         required
                       />
