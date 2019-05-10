@@ -1,8 +1,6 @@
 import React from "react";
 import axios from "axios";
 
-import { Redirect } from "react-router-dom";
-
 // reactstrap components
 import {
   Button,
@@ -19,30 +17,48 @@ import {
   Alert
 } from "reactstrap";
 
+import './StyleHelpers/Login.css'
+
 class Login extends React.Component {
   state = {
     credentials: {
       email: "",
       password: ""
     },
-    redirectToAdmin: false,
-    loading: true,
-    isOpened: false
+    isErrorAlertOpened: false
   };
+
+  // Check if the status from the server is 401 when the component is mounted
+  componentDidMount() {
+    axios.interceptors.response.use(
+      response => {
+        return response;
+      },
+      error => {
+        if (error.response.status === 401) {
+          this.setState({
+            credentials: {
+              email: "",
+              password: ""
+            },
+            isErrorAlertOpened: true
+          });
+        }
+        return error;
+      }
+    );
+  }
 
   getJWT = () => {
     axios
-      .post("http://136ea.k.time4vps.cloud:9090/api/v1/auth", {
+      .post("/auth", {
         email: this.state.credentials.email,
         password: this.state.credentials.password
       })
       .then(res => {
         if (res.status === 200 && res.headers.authorization) {
           localStorage.setItem("jwt-token", res.headers.authorization);
-          this.setState({ redirectToAdmin: true });
-        } else {
-          //alert("invalid credentials");
-          this.setState({ loading: false });
+          this.props.history.push("/admin/index");
         }
       })
       .catch(e => console.log(e));
@@ -78,37 +94,13 @@ class Login extends React.Component {
 
   // Close invalid credentials Alert
   toggleInvalidCredentials = () => {
-    this.setState(oldState => ({ isOpened: !oldState.isOpened }));
+    this.setState(oldState => ({
+      isErrorAlertOpened: !oldState.isErrorAlertOpened
+    }));
   };
 
-  // Check if the status from the server is 401 when the component is mounted 
-  componentDidMount() {
-    axios.interceptors.response.use(
-      response => {
-        return response;
-      },
-      error => {
-        if (error.response.status === 401) {
-          this.setState({
-            credentials: {
-              email: "",
-              password: ""
-            },
-            redirectToAdmin: false,
-            loading: true,
-            isOpened: false
-          });
-        }
-        return error;
-      }
-    );
-  }
-
   render() {
-    const redir = this.state.redirectToAdmin;
-    const jwt = localStorage.getItem("jwt-token");
-    const loading = this.state.loading;
-    const isOpen = this.state.isOpened;
+    const isOpen = this.state.isErrorAlertOpened;
 
     let cardTitle = (
       <div>
@@ -118,17 +110,15 @@ class Login extends React.Component {
       </div>
     );
 
-    if (!loading && !isOpen) {
+    if (isOpen) {
       cardTitle = (
         <Alert
           color="danger"
-          className="text-center"
+          className="text-center error-alert"
           onClick={this.toggleInvalidCredentials}
-          style={{ cursor: "pointer" }}
         >
           <h5 className="text-white">
-            {" "}
-            Invalid username or password!{" "}
+            Invalid username or password!
             <i className="ni ni-fat-remove text-right " />
           </h5>
           <small className="d-block">Please,try again.</small>
@@ -136,63 +126,58 @@ class Login extends React.Component {
       );
     }
 
-    if (redir && jwt !== "null") {
-      return <Redirect to="/admin/index" />;
-    } else {
-      return (
-        <>
-          {localStorage.setItem("jwt-token", null)}
-          <Col lg="5" md="7">
-            <Card className="bg-secondary shadow border-0">
-              <CardBody className="px-lg-5 py-lg-5">
-                <CardTitle>{cardTitle}</CardTitle>
-                <Form role="form" onSubmit={this.loginSubmitHandle}>
-                  <FormGroup className="mb-3">
-                    <InputGroup className="input-group-alternative">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-email-83" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input
-                        placeholder="Email"
-                        name="email"
-                        type="email"
-                        value={this.state.credentials.email}
-                        onChange={e => this.emailInputHandler(e)}
-                        required
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-lock-circle-open" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input
-                        placeholder="Password"
-                        name="password"
-                        type="password"
-                        value={this.state.credentials.password}
-                        onChange={e => this.passwordInputHandler(e)}
-                        required
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <div className="text-center">
-                    <Button className="my-4" color="primary" type="submit">
-                      Log in
-                    </Button>
-                  </div>
-                </Form>
-              </CardBody>
-            </Card>
-          </Col>
-        </>
-      );
-    }
+    return (
+      <>
+        <Col lg="5" md="7">
+          <Card className="bg-secondary shadow border-0">
+            <CardBody className="px-lg-5 py-lg-5">
+              <CardTitle>{cardTitle}</CardTitle>
+              <Form role="form" onSubmit={this.loginSubmitHandle}>
+                <FormGroup className="mb-3">
+                  <InputGroup className="input-group-alternative">
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="ni ni-email-83" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      placeholder="Email"
+                      name="email"
+                      type="email"
+                      value={this.state.credentials.email}
+                      onChange={e => this.emailInputHandler(e)}
+                      required
+                    />
+                  </InputGroup>
+                </FormGroup>
+                <FormGroup>
+                  <InputGroup className="input-group-alternative">
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="ni ni-lock-circle-open" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      placeholder="Password"
+                      name="password"
+                      type="password"
+                      value={this.state.credentials.password}
+                      onChange={e => this.passwordInputHandler(e)}
+                      required
+                    />
+                  </InputGroup>
+                </FormGroup>
+                <div className="text-center">
+                  <Button className="my-4" color="primary" type="submit">
+                    Log in
+                  </Button>
+                </div>
+              </Form>
+            </CardBody>
+          </Card>
+        </Col>
+      </>
+    );
   }
 }
 
