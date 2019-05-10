@@ -25,29 +25,9 @@ class Login extends React.Component {
       email: "",
       password: ""
     },
-    isErrorAlertOpened: false
+    isErrorAlertOpened: false,
+    error: false
   };
-
-  // Check if the status from the server is 401 when the component is mounted
-  componentDidMount() {
-    axios.interceptors.response.use(
-      response => {
-        return response;
-      },
-      error => {
-        if (error.response.status === 401) {
-          this.setState({
-            credentials: {
-              email: "",
-              password: ""
-            },
-            isErrorAlertOpened: true
-          });
-        }
-        return error;
-      }
-    );
-  }
 
   getJWT = () => {
     axios
@@ -61,7 +41,14 @@ class Login extends React.Component {
           this.props.history.push("/admin/index");
         }
       })
-      .catch(e => console.log(e));
+      .catch(e => this.setState({
+        credentials: {
+          email: "",
+          password: ""
+        },
+        isErrorAlertOpened: true,
+        error: true
+      }));
   };
 
   // Login form submit
@@ -101,6 +88,7 @@ class Login extends React.Component {
 
   render() {
     const isOpen = this.state.isErrorAlertOpened;
+    const error = this.state.error;
 
     let cardTitle = (
       <div>
@@ -110,7 +98,7 @@ class Login extends React.Component {
       </div>
     );
 
-    if (isOpen) {
+    if (isOpen && error) {
       cardTitle = (
         <Alert
           color="danger"
