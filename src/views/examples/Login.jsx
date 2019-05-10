@@ -109,7 +109,7 @@ class Login extends React.Component {
             Invalid username or password!
             <i className="ni ni-fat-remove text-right " />
           </h5>
-          <small className="d-block">Please,try again.</small>
+          <small className="d-block">Please, try again.</small>
         </Alert>
       );
     }
@@ -132,6 +132,8 @@ class Login extends React.Component {
                       placeholder="Email"
                       name="email"
                       type="email"
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,10}$" 
+                      title="Invalid email address"
                       value={this.state.credentials.email}
                       onChange={e => this.emailInputHandler(e)}
                       required
