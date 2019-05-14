@@ -2,7 +2,6 @@ import React from "react";
 import axios from "axios";
 import "./Tables.css";
 
-// reactstrap components
 import {
   Button,
   Card,
@@ -19,7 +18,6 @@ import {
 
 class Tables extends React.Component {
   constructor(props) {
-    console.log("creation phase [constructor] [FIRST CALLED] -1");
     super(props);
     this.startDateSortedArr = [];
     this.endDateSortedArr = [];
@@ -34,20 +32,8 @@ class Tables extends React.Component {
   }
 
   componentDidMount() {
-    console.log("creation phase [componentDidMount] [FOURTH CALLED] -4");
-    //
-
-    var token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBwcm92aXguY29tIiwiaWF0IjoxNTU3ODM0MDQxLCJleHAiOjE1NTc4MzU4NDF9.ndYA_u0ClqtIHZOnNODZA9zSvonVtxN-a1C6S4scNAdkowSdvCBjs3smdqR82mXi79QxYRl0PjLbrCbm01snKw'
-    var headers = {
-      'Authorization': 'Bearer '+ token,
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-    }
-
-
       axios.get("http://136ea.k.time4vps.cloud:9090/api/v1/positions")
       .then(response => {
-        console.log("RESPONSE from GET request:", response);
         const respData = response.data;
         this.pagesCount = Math.ceil(respData.length / this.pageSize);
         this.setState({ loadedData: respData });
@@ -57,25 +43,19 @@ class Tables extends React.Component {
       });
   }
 
-
   sortUsers = (sortOpt, name) => {
     if (this.state.loadedData !== null) {
       let positionArray = [...this.state.loadedData];
-      console.log('sorting clicked!')
     }
   };
-
 
   handleClick = (e, index) => {
     e.preventDefault();
     this.setState({ previousInd: index });
     this.setState({
       currentPage: index
-    });
+    })
   };
-
-
-
 
   render() {
     const { currentPage } = this.state;
@@ -144,6 +124,7 @@ class Tables extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
+
                     {this.state.loadedData
                       ? this.state.loadedData
                           .slice(
