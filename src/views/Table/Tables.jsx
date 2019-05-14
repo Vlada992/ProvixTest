@@ -24,6 +24,8 @@ class Tables extends React.Component {
     this.pageSize = 20;
     this.pagesCount = ''
 
+
+
     this.state = {
       loadedData: null,
       sortBtns: "sort-btns-white",
@@ -45,9 +47,34 @@ class Tables extends React.Component {
 
   sortUsers = (sortOpt, name) => {
     if (this.state.loadedData !== null) {
-      let positionArray = [...this.state.loadedData];
-    }
-  };
+        let positionArray =  [...this.state.loadedData];
+
+        positionArray.sort((a, b) => {
+          if(name == 'name') {
+            if(sortOpt === 1){
+                return a[name] === b[name] ? 0 : a[name] < b[name] ? -1 : 1;
+            } 
+                return a[name] === b[name] ? 0 : a[name] > b[name] ? -1 : 1;
+
+          } else if(name == 'start'){
+            if(sortOpt === 1){
+              this.startDateSortedArr.sort(function(a,b) {
+                return new Date(a).getTime() - new Date(b).getTime() 
+              });
+            } else if(sortOpt === 0){
+              this.startDateSortedArr.sort(function(a,b) {
+                return new Date(b).getTime() - new Date(a).getTime() 
+              })
+            }
+          }
+        })
+
+        this.setState({
+          loadedData: positionArray,
+          sortBtns:'sort-btns-red'
+         })
+      }
+    }; // sort users functionality
 
   handleClick = (e, index) => {
     e.preventDefault();
