@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import './Tables.css';
+import "./Tables.css";
 
 // reactstrap components
 import {
@@ -21,57 +21,67 @@ class Tables extends React.Component {
   constructor(props) {
     console.log("creation phase [constructor] [FIRST CALLED] -1");
     super(props);
+    this.startDateSortedArr = [];
+    this.endDateSortedArr = [];
+    this.pageSize = 20;
+    this.pagesCount = ''
+
     this.state = {
       loadedData: null,
-      sortBtns: 'sort-btns-white'
+      sortBtns: "sort-btns-white",
+      currentPage: 0
     };
   }
 
-
   componentDidMount() {
     console.log("creation phase [componentDidMount] [FOURTH CALLED] -4");
-    axios
-      .get("http://localhost:3004/posts")
+    //
+
+    var token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBwcm92aXguY29tIiwiaWF0IjoxNTU3ODM0MDQxLCJleHAiOjE1NTc4MzU4NDF9.ndYA_u0ClqtIHZOnNODZA9zSvonVtxN-a1C6S4scNAdkowSdvCBjs3smdqR82mXi79QxYRl0PjLbrCbm01snKw'
+    var headers = {
+      'Authorization': 'Bearer '+ token,
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+    }
+
+
+      axios.get("http://136ea.k.time4vps.cloud:9090/api/v1/positions")
       .then(response => {
         console.log("RESPONSE from GET request:", response);
-        const respData = response.data.slice(0, 20);
+        const respData = response.data;
+        this.pagesCount = Math.ceil(respData.length / this.pageSize);
         this.setState({ loadedData: respData });
       })
       .catch(error => {
         console.log(error);
       });
+  }
+
+
+  sortUsers = (sortOpt, name) => {
+    if (this.state.loadedData !== null) {
+      let positionArray = [...this.state.loadedData];
+      console.log('sorting clicked!')
+    }
   };
 
-   sortUsers = (sortOpt, title) => {
-    if (this.state.loadedData !== null) {
-        let positionArray =  [...this.state.loadedData];
-        positionArray.sort((a, b) => {
-            if(sortOpt === 1){
-                return a[title] === b[title] ? 0 : a[title] < b[title] ? -1 : 1;
-            } 
-                return a[title] === b[title] ? 0 : a[title] > b[title] ? -1 : 1;
-        })
 
-        this.setState({
-          loadedData: positionArray,
-          sortBtns:'sort-btns-red'
-         })
-      }
-    };
+  handleClick = (e, index) => {
+    e.preventDefault();
+    this.setState({ previousInd: index });
+    this.setState({
+      currentPage: index
+    });
+  };
 
-
-  clickPage1 = () => {
-    console.log('page one clicked!')
-  } //strana 1
 
 
 
   render() {
+    const { currentPage } = this.state;
     return (
       <>
-        {/* Page content */}
         <Container className="mt--7" fluid>
-          {/* Table */}
           <Row>
             <div className="col">
               <Card className="shadow">
@@ -81,66 +91,126 @@ class Tables extends React.Component {
 
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
-                    <tr className='tr-heading'>
+                    <tr className="tr-heading">
                       <th scope="col">
-                        Title
+                        name
                         <button
                           className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(1, 'title')}
+                          onClick={() => this.sortUsers(1, "name")}
                         >
                           ▲
                         </button>
                         <button
                           className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(0, 'title')}
+                          onClick={() => this.sortUsers(0, "name")}
                         >
                           ▼
                         </button>
                       </th>
 
-                      <th>Start date</th>
-                      <th>End date</th>
+                      <th>
+                        Start date
+                        <button
+                          className={this.state.sortBtns}
+                          onClick={() => this.sortUsers(1, "start")}
+                        >
+                          ▲
+                        </button>
+                        <button
+                          className={this.state.sortBtns}
+                          onClick={() => this.sortUsers(0, "start")}
+                        >
+                          ▼
+                        </button>
+                      </th>
+
+                      <th>
+                        End date
+                        <button
+                          className={this.state.sortBtns}
+                          onClick={() => this.sortUsers(1, "end")}
+                        >
+                          ▲
+                        </button>
+                        <button
+                          className={this.state.sortBtns}
+                          onClick={() => this.sortUsers(0, "end")}
+                        >
+                          ▼
+                        </button>
+                      </th>
 
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {this.state.loadedData
-                      ? this.state.loadedData.map((data, ind) => (
+                      ? this.state.loadedData
+                          .slice(
+                            currentPage * this.pageSize,
+                            (currentPage + 1) * this.pageSize
+                          )
+                          .map((data, ind) => {
+                            let startDt = new Date(data.startDate);
+                            let endDt = new Date(data.endDate);
+                            let startDateFormatted =
+                              ("0" + (startDt.getMonth() + 1)).slice(-2) +
+                              "/" +
+                              ("0" + startDt.getDate()).slice(-2) +
+                              "/" +
+                              String(startDt.getFullYear()).slice(2) +
+                              " " +
+                              ("0" + startDt.getHours()).slice(-2) +
+                              ":" +
+                              ("0" + startDt.getMinutes()).slice(-2);
+                            let endDateFormatted =
+                              ("0" + (endDt.getMonth() + 1)).slice(-2) +
+                              "/" +
+                              ("0" + endDt.getDate()).slice(-2) +
+                              "/" +
+                              String(endDt.getFullYear()).slice(2) +
+                              " " +
+                              ("0" + endDt.getHours()).slice(-2) +
+                              ":" +
+                              ("0" + endDt.getMinutes()).slice(-2);
+                            this.startDateSortedArr.push(startDateFormatted);
+                            this.endDateSortedArr.push(endDateFormatted);
 
-                          <tr key={ind}>
-                            <th className='t-header' scope="row">
-                              <Media className="align-items-center">
-                                <Media>
-                                  <span className="mb-0 text-sm">
-                                    {data.title}
-                                  </span>
-                                </Media>
-                              </Media>
-                            </th>
+                            return (
+                              <tr key={ind}>
+                                <td >
+                                  <Media className="align-items-center">
+                                    <Media>
+                                      <span className="mb-0 text-sm">
+                                        {data.name}
+                                      </span>
+                                    </Media>
+                                  </Media>
+                                </td>
 
-                            <td>
-                            {data.id}
-                            </td>
+                                <td>
+                                  {this.startDateSortedArr.length > 1
+                                    ? this.startDateSortedArr[ind]
+                                    : startDateFormatted}
+                                </td>
 
-                            <td>
-                            {data.id + ind}
-                            </td>
+                                <td>
+                                  {this.endDateSortedArr.length > 1
+                                    ? this.endDateSortedArr[ind]
+                                    : endDateFormatted}
+                                </td>
 
-                            <td>
-                              <Button  
-                              color="info" 
-                              type="button">
-                                Edit
-                              </Button>
-                              <Button 
-                              color="danger" 
-                              type="button">
-                                Delete
-                              </Button>
-                            </td>
-                          </tr>
-                        ))
+                                <td>
+                                  <Button color="info" type="button">
+                                    Edit
+                                  </Button>
+                                  <Button color="danger" type="button">
+                                    Delete
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          })
                       : null}
                   </tbody>
                 </Table>
@@ -151,44 +221,34 @@ class Tables extends React.Component {
                       className="pagination justify-content-end mb-0"
                       listClassName="justify-content-end mb-0"
                     >
-                      <PaginationItem className="disabled">
+                      <PaginationItem disabled={currentPage <= 0}>
                         <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                          tabIndex="-1"
+                          href="#"
+                          previous
+                          onClick={e => this.handleClick(e, currentPage - 1)}
                         >
                           <i className="fas fa-angle-left" />
                           <span className="sr-only">Previous</span>
                         </PaginationLink>
                       </PaginationItem>
-                      <PaginationItem className="active">
+
+                      {[...Array(this.pagesCount)].map((page, i) => (
+                        <PaginationItem active={i === currentPage} key={i}>
+                          <PaginationLink
+                            href="#"
+                            onClick={e => this.handleClick(e, i)}
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+
+                      <PaginationItem
+                        disabled={currentPage >= this.pagesCount - 1}
+                      >
                         <PaginationLink
-                          href="#pablo"
-                          onClick={() => this.clickPage1()}
-                        >
-                          1
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          2 <span className="sr-only">(current)</span>
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          3
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
+                          href=""
+                          onClick={e => this.handleClick(e, currentPage + 1)}
                         >
                           <i className="fas fa-angle-right" />
                           <span className="sr-only">Next</span>
@@ -200,8 +260,6 @@ class Tables extends React.Component {
               </Card>
             </div>
           </Row>
-
-          {/* Dark table */}
         </Container>
       </>
     );
