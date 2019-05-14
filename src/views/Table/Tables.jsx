@@ -22,7 +22,7 @@ class Tables extends React.Component {
     this.startDateSortedArr = [];
     this.endDateSortedArr = [];
     this.pageSize = 20;
-    this.pagesCount = ''
+    this.pagesCount = "";
 
     this.state = {
       loadedData: null,
@@ -32,7 +32,8 @@ class Tables extends React.Component {
   }
 
   componentDidMount() {
-      axios.get("http://136ea.k.time4vps.cloud:9090/api/v1/positions")
+    axios
+      .get("http://136ea.k.time4vps.cloud:9090/api/v1/positions")
       .then(response => {
         const respData = response.data;
         this.pagesCount = Math.ceil(respData.length / this.pageSize);
@@ -43,9 +44,50 @@ class Tables extends React.Component {
       });
   }
 
-  sortUsers = (sortOpt, name) => {
+  sortUsers = (ascending, name) => {
     if (this.state.loadedData !== null) {
       let positionArray = [...this.state.loadedData];
+      let startDtA, startDtB, endDtA, endDtB;
+
+      positionArray.sort((a, b) => {
+        startDtA = String(a.startDate)
+          .slice(0, -5)
+          .split("T")
+          .join(" ");
+        startDtB = String(b.startDate)
+          .slice(0, -5)
+          .split("T")
+          .join(" ");
+        endDtA = String(a.endDate)
+          .slice(0, -5)
+          .split("T")
+          .join(" ");
+        endDtB = String(b.endDate)
+          .slice(0, -5)
+          .split("T")
+          .join(" ");
+
+        if (name == "name") {
+          if (ascending) {
+            return a[name] === b[name] ? 0 : a[name] < b[name] ? -1 : 1;
+          }
+          return a[name] === b[name] ? 0 : a[name] > b[name] ? -1 : 1;
+        } else if (name == "start") {
+          if (ascending) {
+            return new Date(startDtA) - new Date(startDtB);
+          }
+            return new Date(startDtB) - new Date(startDtA);
+        } else if (name == "end") {
+          if (ascending) {
+            return new Date(endDtA) - new Date(endDtB);
+          } 
+            return new Date(endDtB) - new Date(endDtA);
+        }
+      });
+
+      this.setState({
+        loadedData: positionArray
+      });
     }
   };
 
@@ -54,7 +96,7 @@ class Tables extends React.Component {
     this.setState({ previousInd: index });
     this.setState({
       currentPage: index
-    })
+    });
   };
 
   render() {
@@ -124,7 +166,6 @@ class Tables extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
-
                     {this.state.loadedData
                       ? this.state.loadedData
                           .slice(
@@ -132,34 +173,18 @@ class Tables extends React.Component {
                             (currentPage + 1) * this.pageSize
                           )
                           .map((data, ind) => {
-                            let startDt = new Date(data.startDate);
-                            let endDt = new Date(data.endDate);
-                            let startDateFormatted =
-                              ("0" + (startDt.getMonth() + 1)).slice(-2) +
-                              "/" +
-                              ("0" + startDt.getDate()).slice(-2) +
-                              "/" +
-                              String(startDt.getFullYear()).slice(2) +
-                              " " +
-                              ("0" + startDt.getHours()).slice(-2) +
-                              ":" +
-                              ("0" + startDt.getMinutes()).slice(-2);
-                            let endDateFormatted =
-                              ("0" + (endDt.getMonth() + 1)).slice(-2) +
-                              "/" +
-                              ("0" + endDt.getDate()).slice(-2) +
-                              "/" +
-                              String(endDt.getFullYear()).slice(2) +
-                              " " +
-                              ("0" + endDt.getHours()).slice(-2) +
-                              ":" +
-                              ("0" + endDt.getMinutes()).slice(-2);
-                            this.startDateSortedArr.push(startDateFormatted);
-                            this.endDateSortedArr.push(endDateFormatted);
+                            var startD = String(data.startDate)
+                              .slice(0, -5)
+                              .split("T")
+                              .join(" ");
+                            var endD = String(data.endDate)
+                              .slice(0, -5)
+                              .split("T")
+                              .join(" ");
 
                             return (
                               <tr key={ind}>
-                                <td >
+                                <td>
                                   <Media className="align-items-center">
                                     <Media>
                                       <span className="mb-0 text-sm">
@@ -169,17 +194,9 @@ class Tables extends React.Component {
                                   </Media>
                                 </td>
 
-                                <td>
-                                  {this.startDateSortedArr.length > 1
-                                    ? this.startDateSortedArr[ind]
-                                    : startDateFormatted}
-                                </td>
+                                <td>{startD}</td>
 
-                                <td>
-                                  {this.endDateSortedArr.length > 1
-                                    ? this.endDateSortedArr[ind]
-                                    : endDateFormatted}
-                                </td>
+                                <td>{endD}</td>
 
                                 <td>
                                   <Button color="info" type="button">
