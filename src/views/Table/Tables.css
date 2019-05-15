@@ -40,10 +40,6 @@ thead th {
     width: 30%
 }
 
-.shadow.card {
-    border: 1px solid #8898aa;
-}
-
 .thead-light {
     border-bottom: 2px solid red;
     height:100px;

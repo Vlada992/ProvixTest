@@ -26,8 +26,7 @@ class Tables extends React.Component {
 
     this.state = {
       loadedData: null,
-      sortBtns: "sort-btns-white",
-      currentPage: 0
+      sortBtns: "sort-btns-white"
     };
   }
 
@@ -44,63 +43,7 @@ class Tables extends React.Component {
       });
   }
 
-  sortUsers = (ascending, name) => {
-    if (this.state.loadedData !== null) {
-      let positionArray = [...this.state.loadedData];
-      let startDtA, startDtB, endDtA, endDtB;
-
-      positionArray.sort((a, b) => {
-        startDtA = String(a.startDate)
-          .slice(0, -5)
-          .split("T")
-          .join(" ");
-        startDtB = String(b.startDate)
-          .slice(0, -5)
-          .split("T")
-          .join(" ");
-        endDtA = String(a.endDate)
-          .slice(0, -5)
-          .split("T")
-          .join(" ");
-        endDtB = String(b.endDate)
-          .slice(0, -5)
-          .split("T")
-          .join(" ");
-
-        if (name == "name") {
-          if (ascending) {
-            return a[name] === b[name] ? 0 : a[name] < b[name] ? -1 : 1;
-          }
-          return a[name] === b[name] ? 0 : a[name] > b[name] ? -1 : 1;
-        } else if (name == "start") {
-          if (ascending) {
-            return new Date(startDtA) - new Date(startDtB);
-          }
-            return new Date(startDtB) - new Date(startDtA);
-        } else if (name == "end") {
-          if (ascending) {
-            return new Date(endDtA) - new Date(endDtB);
-          } 
-            return new Date(endDtB) - new Date(endDtA);
-        }
-      });
-
-      this.setState({
-        loadedData: positionArray
-      });
-    }
-  };
-
-  handleClick = (e, index) => {
-    e.preventDefault();
-    this.setState({ previousInd: index });
-    this.setState({
-      currentPage: index
-    });
-  };
-
   render() {
-    const { currentPage } = this.state;
     return (
       <>
         <Container className="mt--7" fluid>
@@ -116,62 +59,19 @@ class Tables extends React.Component {
                     <tr className="tr-heading">
                       <th scope="col">
                         name
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(1, "name")}
-                        >
-                          ▲
-                        </button>
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(0, "name")}
-                        >
-                          ▼
-                        </button>
                       </th>
-
                       <th>
                         Start date
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(1, "start")}
-                        >
-                          ▲
-                        </button>
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(0, "start")}
-                        >
-                          ▼
-                        </button>
                       </th>
-
                       <th>
                         End date
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(1, "end")}
-                        >
-                          ▲
-                        </button>
-                        <button
-                          className={this.state.sortBtns}
-                          onClick={() => this.sortUsers(0, "end")}
-                        >
-                          ▼
-                        </button>
                       </th>
-
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {this.state.loadedData
                       ? this.state.loadedData
-                          .slice(
-                            currentPage * this.pageSize,
-                            (currentPage + 1) * this.pageSize
-                          )
                           .map((data, ind) => {
                             var startD = String(data.startDate)
                               .slice(0, -5)
@@ -195,7 +95,6 @@ class Tables extends React.Component {
                                 </td>
 
                                 <td>{startD}</td>
-
                                 <td>{endD}</td>
 
                                 <td>
@@ -212,49 +111,6 @@ class Tables extends React.Component {
                       : null}
                   </tbody>
                 </Table>
-
-                <CardFooter className="py-4">
-                  <nav aria-label="...">
-                    <Pagination
-                      className="pagination justify-content-end mb-0"
-                      listClassName="justify-content-end mb-0"
-                    >
-                      <PaginationItem disabled={currentPage <= 0}>
-                        <PaginationLink
-                          href="#"
-                          previous
-                          onClick={e => this.handleClick(e, currentPage - 1)}
-                        >
-                          <i className="fas fa-angle-left" />
-                          <span className="sr-only">Previous</span>
-                        </PaginationLink>
-                      </PaginationItem>
-
-                      {[...Array(this.pagesCount)].map((page, i) => (
-                        <PaginationItem active={i === currentPage} key={i}>
-                          <PaginationLink
-                            href="#"
-                            onClick={e => this.handleClick(e, i)}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-
-                      <PaginationItem
-                        disabled={currentPage >= this.pagesCount - 1}
-                      >
-                        <PaginationLink
-                          href=""
-                          onClick={e => this.handleClick(e, currentPage + 1)}
-                        >
-                          <i className="fas fa-angle-right" />
-                          <span className="sr-only">Next</span>
-                        </PaginationLink>
-                      </PaginationItem>
-                    </Pagination>
-                  </nav>
-                </CardFooter>
               </Card>
             </div>
           </Row>
