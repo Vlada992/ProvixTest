@@ -49,7 +49,9 @@ class Positions extends React.Component {
       toggleSubmit: true,
       positionId: "",
       sorting:"asc",
-      arrow:'▼'
+      arrow:'▼',
+      previousInd:'',
+      currentPage: 0
     };
   }
 
@@ -130,7 +132,7 @@ class Positions extends React.Component {
       axios.get(`/positions?sort=name,${this.state.sorting}`)
       .then(response => {
         const respData = response.data;
-        const pgCount = Math.ceil(respData.length / this.state.pageSize);
+        const pgCount = Math.ceil(respData.length / this.state.pageSize); //number of pages  100/ 20 = 5 stranica
         this.setState({
           loadedData: respData,
           pagesCount: pgCount
@@ -225,6 +227,17 @@ class Positions extends React.Component {
     });
   }
 
+  //pagination methods
+  handleClick = (e, index) => {
+    e.preventDefault();
+    //previousInd: index,
+
+    this.setState({
+      currentPage: index
+    });
+  };
+  //pagination methods
+
   componentDidMount() {
       this.showRecords()
   }
@@ -248,6 +261,7 @@ class Positions extends React.Component {
               sortingAsc={this.sortingAsc}
               sortingDesc={this.sortingDesc}
               sortingNames={this.sortingNames}
+              handleClick={this.handleClick}
             />
           </Col>
         </Row>

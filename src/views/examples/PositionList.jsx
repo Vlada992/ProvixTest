@@ -1,3 +1,6 @@
+
+
+
 import React from "react";
 import axios from "axios";
 import moment from "moment";
@@ -33,6 +36,17 @@ class Positions extends React.Component {
   }
 
   render() {
+    console.log('propertiji:', this.props);
+    const { currentPage } = this.props.states
+    console.log(currentPage)
+
+    
+     console.log('vrednosti API responseA:', this.props.states.loadedData)
+    
+    
+      
+    
+   
     return (
       <>
         <Header />
@@ -72,7 +86,10 @@ class Positions extends React.Component {
                   </thead>
                   <tbody>
                     {this.props.states.loadedData
-                      ? this.props.states.loadedData.map((data, ind) => {
+                      ? this.props.states.loadedData.slice(
+                        currentPage * this.props.states.pageSize,  
+                        (currentPage + 1) * this.props.states.pageSize
+                      ).map((data, ind) => {
                           const startDate = this.props.formatDate(
                             data.startDate
                           );
@@ -119,17 +136,39 @@ class Positions extends React.Component {
                       className="pagination justify-content-end mb-0"
                       listClassName="justify-content-end mb-0"
                     >
-                      <PaginationItem className="disabled">
+                      <PaginationItem 
+                      disabled={currentPage <= 0}
+                      >
                         <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
+                          href="#"
+                          onClick={e => this.props.handleClick(e, currentPage - 1)}
                           tabIndex="-1"
                         >
                           <i className="fas fa-angle-left" />
                           <span className="sr-only">Previous</span>
                         </PaginationLink>
                       </PaginationItem>
-                      <PaginationItem className="active">
+
+                      {[...Array(this.props.states.pagesCount)].map((page, i, arr) => (
+                       /*i == 0 || i == (arr.length - 1) ? */
+                        <PaginationItem active={i === currentPage} key={i}>
+                          <PaginationLink
+                            href="#"
+                            onClick={e => this.props.handleClick(e, i)}
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>  
+                        /*</nav>:  null*/
+
+                       
+                      ))}
+
+                      
+
+                       
+
+                      {/*<PaginationItem className="active">
                         <PaginationLink
                           href="#pablo"
                           onClick={e => e.preventDefault()}
@@ -137,6 +176,7 @@ class Positions extends React.Component {
                           1
                         </PaginationLink>
                       </PaginationItem>
+
                       <PaginationItem>
                         <PaginationLink
                           href="#pablo"
@@ -145,6 +185,7 @@ class Positions extends React.Component {
                           2 <span className="sr-only">(current)</span>
                         </PaginationLink>
                       </PaginationItem>
+
                       <PaginationItem>
                         <PaginationLink
                           href="#pablo"
@@ -152,18 +193,23 @@ class Positions extends React.Component {
                         >
                           3
                         </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
+                      </PaginationItem>*/}
+
+                      <PaginationItem
+                        disabled={currentPage >= this.props.states.pagesCount - 1}
+                      >
                         <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
+                          href=""
+                          onClick={e => this.props.handleClick(e, currentPage + 1)}
                         >
                           <i className="fas fa-angle-right" />
                           <span className="sr-only">Next</span>
                         </PaginationLink>
                       </PaginationItem>
+                     
                     </Pagination>
                   </nav>
+
                 </CardFooter>
               </Card>
             </div>
@@ -175,3 +221,5 @@ class Positions extends React.Component {
 }
 
 export default Positions;
+
+

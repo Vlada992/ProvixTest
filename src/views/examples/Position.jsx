@@ -37,6 +37,7 @@ class Position extends React.Component {
 
   render() {
     const endDate = this.formatDate(this.props.position.endDate);
+    console.log('propertiji:', this.props);
     return (
       <Container className="p-3 mb-3 bg-light text-dark rounded z-index-3 border-primary position-top-border">
         <h1 className="text-dark open-positions-h1" id={this.props.id}>
