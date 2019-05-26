@@ -10,16 +10,22 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.jsx";
 import AuthLayout from "layouts/Auth.jsx";
+import CareersLayout from "layouts/Career";
 
-axios.defaults.baseURL = 'http://136ea.k.time4vps.cloud:9090/api/v1/';
+axios.defaults.baseURL = 'http://136ea.k.time4vps.cloud:9090/api/v1';
+
 
 ReactDOM.render(
   <BrowserRouter>
     <Switch>
       <Route path="/admin" render={props => <AdminLayout {...props} />} />
       <Route path="/auth" render={props => <AuthLayout {...props} />} />
+      <Route path="/careers" render={props => <CareersLayout {...props} />} />
       <Redirect from="/" to="/auth/login" />
     </Switch>
   </BrowserRouter>,
   document.getElementById("root")
 );
+
+
+

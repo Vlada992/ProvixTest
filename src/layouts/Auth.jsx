@@ -55,6 +55,7 @@ class Auth extends React.Component {
               </svg>
             </div>
           </div>
+          {/* Page content */}
           <Container className="mt--8 pb-5">
             <Row className="justify-content-center">
               <Switch>{this.getRoutes(routes)}</Switch>
@@ -68,4 +69,3 @@ class Auth extends React.Component {
 }
 
 export default Auth;
-

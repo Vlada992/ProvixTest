@@ -38,7 +38,7 @@ class Login extends React.Component {
       .then(res => {
         if (res.status === 200 && res.headers.authorization) {
           localStorage.setItem("jwt-token", res.headers.authorization);
-          this.props.history.push("/admin/index");
+          this.props.history.push("/admin/positions");
         }
       })
       .catch(e => this.setState({
