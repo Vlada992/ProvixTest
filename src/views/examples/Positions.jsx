@@ -49,9 +49,10 @@ class Positions extends React.Component {
       toggleSubmit: true,
       positionId: "",
       sorting:"asc",
-      arrow:'▼',
+      arrow: true, //'▼',
       previousInd:'',
-      currentPage: 0
+      currentPage: 0,
+      initialPage:0
     };
   }
 
@@ -121,7 +122,7 @@ class Positions extends React.Component {
         }
       })
       .then(()=> {
-        this.showRecords()
+        this.sortingNames(this.state.sorting, true) //this.showRecords()
       })
       .catch(error => {
         console.log(error);
@@ -133,13 +134,12 @@ class Positions extends React.Component {
         console.log('pagination')
         console.log(pageArg)
       }
-      axios.get(`/positions?page=${this.state.currentPage}&size=${this.state.pageSize}&sort=name,${this.state.sorting}`)
+      axios.get(`/positions?page=${this.state.currentPage}&size=100&sort=name,${this.state.sorting}`)
       .then(response => {
         const respData = response.data.content;
         console.log('RESPDATA:',respData);
         const pgCount = Math.ceil(respData.length / this.state.pageSize); //number of pages  100/ 20 = 5 stranica
-        console.log('pg counter:', pgCount)
-        this.setState({
+          this.setState({
           loadedData: respData,
           pagesCount: pgCount
         });
@@ -170,7 +170,7 @@ class Positions extends React.Component {
         }
       })
       .then(() => {
-        this.showRecords()
+        this.sortingNames(this.state.sorting, true) //this.showRecords()
       })
       .catch(error => {
         console.log(error);
@@ -217,9 +217,8 @@ class Positions extends React.Component {
     return moment(date).format(format);
   };
 
-  sortingNames = (sort, arrow) => {
-    axios
-    .get(`/positions/?sort=name,${sort}`)
+ /* sortingNames = (sort, arrow) => {
+    axios.get(`/positions?page=${this.state.currentPage}&size=100&sort=name,${this.state.sorting}`)
     .then(response => {
       const respData = response.data.content;
       this.setState({
@@ -231,7 +230,30 @@ class Positions extends React.Component {
     .catch(error => {
       console.log(error);
     });
+  }*/
+
+  sortingNames = (sort, booleanArg) => {
+    if(!booleanArg){
+      this.setState({arrow:!this.state.arrow})
+    }
+    /*axios
+    .get(`/positions/?sort=name,${sort}`)*/
+    axios.get(`/positions?page=${this.state.initialPage}&size=100&sort=name,${sort}`)
+    .then(response => {
+      const respData = response.data.content;
+      console.log('response is:', respData)
+      const pgCount = Math.ceil(respData.length / this.state.pageSize);
+      this.setState({
+        loadedData: respData,
+        sorting:sort,
+        pagesCount:pgCount,
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
+
 
   //pagination methods
   handleClick = (e, index) => {
@@ -241,11 +263,12 @@ class Positions extends React.Component {
     this.setState({
       currentPage: index
     });
+    console.log('curentpage:', this.state.currentPage, 'index current:', index)
   };
   //pagination methods
 
   componentDidMount() {
-      this.showRecords()
+    this.sortingNames(this.state.sorting, true)  //this.showRecords()
   }
 
   render() {

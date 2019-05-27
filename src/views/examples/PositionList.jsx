@@ -46,7 +46,7 @@ class Positions extends React.Component {
     
       
     
-   
+
     return (
       <>
         <Header />
@@ -72,21 +72,25 @@ class Positions extends React.Component {
                   </h3>
                 </CardHeader>
                 <Table className="align-items-center table-flush" responsive>
-                  <thead className="thead-light">
+                <thead className="thead-light">
                     <tr>
                       <th scope="col">Name
                       <Button 
                       color='link' 
-                      onClick={this.props.states.sorting == 'asc'? () => this.props.sortingNames('desc', '▲') : () => this.props.sortingNames('asc', '▼')}>{this.props.states.arrow}</Button>
+                      onClick={this.props.states.sorting == 'asc' ? () => this.props.sortingNames('desc', false) : () => this.props.sortingNames('asc', false)}>{this.props.states.arrow ? '▲'  : '▼'}</Button>
                       </th>
                       <th scope="col">Start date</th>
                       <th scope="col">End date</th>
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {this.props.states.loadedData
-                      ? this.props.states.loadedData.map((data, ind) => {
+                      ? this.props.states.loadedData.slice(
+                        currentPage * this.props.states.pageSize,  
+                        (currentPage + 1) * this.props.states.pageSize
+                      ).map((data, ind) => {
                           const startDate = this.props.formatDate(
                             data.startDate
                           );
@@ -128,8 +132,14 @@ class Positions extends React.Component {
                   </tbody>
                 </Table>
                 <CardFooter className="py-4">
+                <select>
+  <option value="volvo">Volvo</option>
+  <option value="saab">Saab</option>
+  <option value="vw">VW</option>
+  <option value="audi" selected>Audi</option>
+</select>
                   <nav aria-label="...">
-                    <Pagination
+                       <Pagination
                       className="pagination justify-content-end mb-0"
                       listClassName="justify-content-end mb-0"
                     >
