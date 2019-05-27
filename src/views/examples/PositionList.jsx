@@ -86,10 +86,7 @@ class Positions extends React.Component {
                   </thead>
                   <tbody>
                     {this.props.states.loadedData
-                      ? this.props.states.loadedData.slice(
-                        currentPage * this.props.states.pageSize,  
-                        (currentPage + 1) * this.props.states.pageSize
-                      ).map((data, ind) => {
+                      ? this.props.states.loadedData.map((data, ind) => {
                           const startDate = this.props.formatDate(
                             data.startDate
                           );
@@ -159,9 +156,7 @@ class Positions extends React.Component {
                             {i + 1}
                           </PaginationLink>
                         </PaginationItem>  
-                        /*</nav>:  null*/
-
-                       
+                        /*</nav>:  null*/                       
                       ))}
 
                       

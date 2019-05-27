@@ -37,7 +37,7 @@ class Positions extends React.Component {
       defaultModal: false,
       loadedData: null,
       sortBtns: "sort-btns-white",
-      pageSize: 20,
+      pageSize: 10,
       pagesCount: "",
       inputName: "",
       textDesc: "",
@@ -128,11 +128,17 @@ class Positions extends React.Component {
       });
   };
 
-    showRecords = () => {
-      axios.get(`/positions?sort=name,${this.state.sorting}`)
+    showRecords = (pageArg) => {
+      if(pageArg){
+        console.log('pagination')
+        console.log(pageArg)
+      }
+      axios.get(`/positions?page=${this.state.currentPage}&size=${this.state.pageSize}&sort=name,${this.state.sorting}`)
       .then(response => {
-        const respData = response.data;
+        const respData = response.data.content;
+        console.log('RESPDATA:',respData);
         const pgCount = Math.ceil(respData.length / this.state.pageSize); //number of pages  100/ 20 = 5 stranica
+        console.log('pg counter:', pgCount)
         this.setState({
           loadedData: respData,
           pagesCount: pgCount
@@ -215,7 +221,7 @@ class Positions extends React.Component {
     axios
     .get(`/positions/?sort=name,${sort}`)
     .then(response => {
-      const respData = response.data;
+      const respData = response.data.content;
       this.setState({
         loadedData: respData,
         sorting:sort,
@@ -230,7 +236,7 @@ class Positions extends React.Component {
   //pagination methods
   handleClick = (e, index) => {
     e.preventDefault();
-    //previousInd: index,
+    //?page=1&size=15
 
     this.setState({
       currentPage: index
